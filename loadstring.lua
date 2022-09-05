@@ -1,5 +1,5 @@
-local library = {};
-library.__index = library;
+local Window = {};
+Window.__index = Window;
 
 -- variables
 local workspace = game:GetService("Workspace");
@@ -30,14 +30,12 @@ end
 local function round(num, increment)
 	local result = math.floor(num / increment + (math.sign(num) * 0.5)) * increment;
 	if result < 0 then result += increment; end
-	return result;
+	return tonumber(string.format('%.02f', result));
 end
 
-local function getLen(table)
+local function getLength(t)
 	local length = 0;
-	for _ in next, table do
-		length += 1;
-	end
+	for _ in next, t do length += 1; end
 	return length;
 end
 
@@ -52,7 +50,7 @@ contentProvider:PreloadAsync({
 });
 
 -- library
-function library.new(title: string?, size: Vector2?)
+function Window.new(title: string?, size: Vector2?)
 	return setmetatable({
 		title = title or "Window",
 		size = size or Vector2.new(350, 250),
@@ -73,6 +71,8 @@ function library.new(title: string?, size: Vector2?)
 			topButtonColor        = Color3.fromRGB(200, 200, 200),
 			menuColor             = Color3.fromRGB(47, 49, 54),
 			menuButtonColor       = Color3.fromRGB(230, 230, 230),
+			tabButtonColor        = Color3.fromRGB(57, 59, 64),
+			tabButtonOutline      = Color3.fromRGB(70, 72, 76),
 			sectionTextColor      = Color3.fromRGB(200, 200, 200),
 			sectionItemColor      = Color3.fromRGB(50, 53, 59),
 			sectionItemTextColor  = Color3.fromRGB(200, 200, 200),
@@ -90,10 +90,10 @@ function library.new(title: string?, size: Vector2?)
 			buttonImageColor      = Color3.fromRGB(255, 255, 255),
 			textFont              = Enum.Font.TitilliumWeb
 		}
-	}, library);
+	}, Window);
 end
 
-function library:Create(class: string, properties: table)
+function Window:Create(class: string, properties: table)
 	assert(class ~= nil, "Missing argument #1 (string expected)");
 	assert(properties ~= nil, "Missing argument #2 (table expected)");
 	local instance = Instance.new(class);
@@ -104,7 +104,7 @@ function library:Create(class: string, properties: table)
 	return instance;
 end
 
-function library:Connect(signal: RBXScriptSignal, callback)
+function Window:Connect(signal: RBXScriptSignal, callback)
 	assert(signal ~= nil, "Missing argument #1 (RBXScriptSignal expected)");
 	assert(callback ~= nil, "Missing argument #2 (function expected)");
 	local connection = signal:Connect(callback);
@@ -112,7 +112,7 @@ function library:Connect(signal: RBXScriptSignal, callback)
 	return connection;
 end
 
-function library:Unload()
+function Window:Unload()
 	for _, connection in next, self.connections do
 		pcall(connection.Disconnect, connection);
 	end
@@ -121,7 +121,7 @@ function library:Unload()
 	end
 end
 
-function library:UpdateTheme(theme: table?)
+function Window:UpdateTheme(theme: table?)
 	theme = theme or self.theme;
 	for _, info in next, self.themeItems do
 		local obj, prop, name = unpack(info);
@@ -129,7 +129,7 @@ function library:UpdateTheme(theme: table?)
 	end
 end
 
-function library:AddTab(title: string?)
+function Window:AddTab(title: string?)
 	local tab = {
 		title = title or "Tab",
 		window = self,
@@ -401,7 +401,7 @@ function library:AddTab(title: string?)
 
 				self.window:Connect(self.mainHolder.InputBegan, function(input, processed)
 					if input.UserInputType.Name == "MouseButton1" and not processed then
-						local itemCount = math.min(getLen(self.contentObjects), 3);
+						local itemCount = math.min(getLength(self.contentObjects), 3);
 						tweenService:Create(self.arrow, TweenInfo.new(0.2), {
 							Rotation = self.open and 180 or 0
 						}):Play();
@@ -766,7 +766,8 @@ function library:AddTab(title: string?)
 		if self.hasInit then
 			self.sectionHolder.Visible = true;
 			tweenService:Create(self.main, TweenInfo.new(0.2), {
-				TextTransparency = 0
+				TextTransparency = 0,
+				BackgroundTransparency = 0
 			}):Play();
 		end
 		for _, tab in next, self.window.tabs do
@@ -780,7 +781,8 @@ function library:AddTab(title: string?)
 		if self.hasInit then
 			self.sectionHolder.Visible = false;
 			tweenService:Create(self.main, TweenInfo.new(0.2), {
-				TextTransparency = 0.5
+				TextTransparency = 0.5,
+				BackgroundTransparency = 0.7
 			}):Play();
 		end
 	end
@@ -790,16 +792,31 @@ function library:AddTab(title: string?)
 
 		self.main = self.window:Create("TextButton", {
 			TextScaled = true,
+			AutoButtonColor = false,
 			Font = self.window.theme.textFont,
 			Text = self.title,
 			Size = UDim2.new(1,0,0,20),
 			TextColor3 = self.window.theme.menuButtonColor,
-			BackgroundTransparency = 1,
+			BackgroundTransparency = 0.7,
+			BackgroundColor3 = self.window.theme.tabButtonColor,
 			TextTransparency = self.window.selectedTab == self and 0 or 0.5,
 			Parent = self.window.tabHolder
 		});
+		table.insert(self.window.themeItems, {self.main, "BackgroundColor3", "tabButtonColor"});
 		table.insert(self.window.themeItems, {self.main, "Font", "textFont" });
 		table.insert(self.window.themeItems, {self.main, "TextColor3", "menuButtonColor" });
+
+		self.window:Create("UICorner", {
+			CornerRadius = UDim.new(0,4),
+			Parent = self.main
+		});
+
+		self.tabOutline = self.window:Create("UIStroke", {
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			Color = self.window.theme.tabButtonOutline,
+			Parent = self.main
+		});
+		table.insert(self.window.themeItems, {self.tabOutline, "Color", "tabButtonOutline"});
 
 		self.sectionHolder = self.window:Create("ScrollingFrame", {
 			ScrollBarThickness = 0,
@@ -846,7 +863,7 @@ function library:AddTab(title: string?)
 	return tab;
 end
 
-function library:Init()
+function Window:Init()
 	assert(not self.hasInit, "Item has already initialized");
 
 	self.base = self:Create("ScreenGui", {
@@ -964,7 +981,17 @@ function library:Init()
 	});
 	table.insert(self.themeItems, {self.tabHolder, "BackgroundColor3", "menuColor" });
 
-	self:Create("UIListLayout", { Parent = self.tabHolder });
+	self:Create("UIListLayout", {
+		Padding = UDim.new(0,5),
+		Parent = self.tabHolder
+	 });
+	self:Create("UIPadding", {
+		PaddingTop = UDim.new(0,5),
+		PaddingBottom = UDim.new(0,5),
+		PaddingLeft = UDim.new(0,5),
+		PaddingRight = UDim.new(0,5),
+		Parent = self.tabHolder
+	});
 
 	self:Connect(self.menuButton.MouseButton1Down, function()
 		if self.menuOpen then
@@ -1046,4 +1073,4 @@ function library:Init()
 	self.hasInit = true;
 end
 
-return library;
+return Window;
