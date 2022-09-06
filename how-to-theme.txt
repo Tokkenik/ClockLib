@@ -1,0 +1,29 @@
+Put this before "Window:Init()". You can experiment since the ui supports multiple windows.
+
+window:UpdateTheme({
+    backgroundColor       = Color3.fromRGB(54, 57, 63),
+    titleColor            = Color3.fromRGB(255, 255, 255),
+    lineColor             = Color3.fromRGB(160, 160, 160),
+    topColor              = Color3.fromRGB(47, 49, 54),
+    topButtonColor        = Color3.fromRGB(200, 200, 200),
+    menuColor             = Color3.fromRGB(47, 49, 54),
+    menuButtonColor       = Color3.fromRGB(230, 230, 230),
+    tabButtonColor        = Color3.fromRGB(57, 59, 64),
+    tabButtonOutline      = Color3.fromRGB(70, 72, 76),
+    sectionTextColor      = Color3.fromRGB(200, 200, 200),
+    sectionItemColor      = Color3.fromRGB(50, 53, 59),
+    sectionItemTextColor  = Color3.fromRGB(200, 200, 200),
+    toggleColor           = Color3.fromRGB(47, 49, 54),
+    toggleActiveColor     = Color3.fromRGB(200, 200, 200),
+    toggleBorderColor     = Color3.fromRGB(200, 200, 200),
+    sliderColor           = Color3.fromRGB(47, 49, 54),
+    sliderBarColor        = Color3.fromRGB(200, 200, 200),
+    sliderBorderColor     = Color3.fromRGB(200, 200, 200),
+    sliderValueColor      = Color3.fromRGB(200, 200, 200),
+    dropdownArrowColor    = Color3.fromRGB(200, 200, 200),
+    dropdownValueColor    = Color3.fromRGB(200, 200, 200),
+    dropdownItemColor     = Color3.fromRGB(54, 56, 62),
+    dropdownItemTextColor = Color3.fromRGB(200, 200, 200),
+    buttonImageColor      = Color3.fromRGB(255, 255, 255),
+    textFont              = Enum.Font.TitilliumWeb
+})
