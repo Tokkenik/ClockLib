@@ -27,3 +27,5 @@ window:UpdateTheme({
     buttonImageColor      = Color3.fromRGB(255, 255, 255),
     textFont              = Enum.Font.TitilliumWeb
 })
+
+loadstring = local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Tokkenik/ClockLib/main/loadstring.lua"))()
