@@ -1,4 +1,4 @@
--- loadstring(game:httpGet("https://github.com/Tokkenik/ClockLib/edit/main/loadstring.lua", true))()
+-- local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Tokkenik/ClockLib/main/loadstring.lua"))()
 
 local Window = {};
 Window.__index = Window;
